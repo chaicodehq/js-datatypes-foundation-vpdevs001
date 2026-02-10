@@ -54,16 +54,74 @@
  */
 export function createThaliDescription(thali) {
   // Your code here
+  if (typeof thali !== "object" || thali === null) return "";
+  if (
+    !thali.name ||
+    !thali.items ||
+    !thali.price ||
+    typeof thali.isVeg !== "boolean"
+  )
+    return "";
+  const name = thali.name.toUpperCase();
+  const isVeg = thali.isVeg ? "Veg" : "Non-Veg";
+  const items = thali.items.join(", ");
+  const price = thali.price.toFixed(2);
+  return `${name} (${isVeg}) - Items: ${items} - Rs.${price}`;
 }
 
 export function getThaliStats(thalis) {
   // Your code here
+  if (!Array.isArray(thalis) || thalis.length === 0) return null;
+
+  const totalThalis = thalis.length;
+  const vegCount = thalis.filter((thali) => thali.isVeg === true).length;
+  const nonVegCount = thalis.filter((thali) => thali.isVeg === false).length;
+  const avgPrice = (
+    thalis.reduce((total, thali) => total + thali.price, 0) / totalThalis
+  ).toFixed(2);
+  const cheapest = Math.min(...thalis.map((thali) => thali.price));
+  const costliest = Math.max(...thalis.map((thali) => thali.price));
+  const names = thalis.map((thali) => thali.name);
+
+  return {
+    totalThalis,
+    vegCount,
+    nonVegCount,
+    avgPrice,
+    cheapest,
+    costliest,
+    names,
+  };
 }
 
 export function searchThaliMenu(thalis, query) {
   // Your code here
+  if (!Array.isArray(thalis) || typeof query !== "string") return [];
+
+  const filteredThali = thalis.filter(
+    (thali) =>
+      thali.name.toLowerCase().includes(query.toLowerCase()) ||
+      thali.items.some((item) =>
+        item.toLowerCase().includes(query.toLowerCase()),
+      ),
+  );
+
+  return filteredThali;
 }
 
 export function generateThaliReceipt(customerName, thalis) {
   // Your code here
+  if (
+    !Array.isArray(thalis) ||
+    thalis.length === 0 ||
+    typeof customerName !== "string"
+  )
+    return "";
+
+  const total = thalis.reduce((total, thali) => total + thali.price, 0);
+  const lines = thalis
+    .map((thali) => `- ${thali.name} x Rs.${thali.price}`)
+    .join("\n");
+
+  return `THALI RECEIPT\n---\nCustomer: ${customerName.toUpperCase()}\n${lines}\n---\nTotal: Rs.${total}\nItems: ${thalis.length}`;
 }
